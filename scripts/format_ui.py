@@ -84,10 +84,10 @@ def token_bracket_to_weight(token:str):
     depth = abs(power)
 
     if re.search(r':\d+.?\d*', token):
-        return token[depth-1:len(token)-1 if depth == 1 else - depth]
+        return token[depth:len(token)-depth]
     
     weight = 1.1 ** power
-    return token[depth-1:len(token)-1 if depth == 1 else -depth] + ('' if token[-depth-1:-depth] == ':' else ':') + f'{weight:.2f}' + get_closing(brackets[0])
+    return '(' + token[depth:len(token)-depth] + ('' if token[-depth-1:-depth] == ':' else ':') + f'{weight:.2f})'
 
 
 def extract_networks(tokens: list):
