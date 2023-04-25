@@ -27,7 +27,9 @@ Inspiration from taken from [canisminor1990/sd-webui-kitchen-theme](https://gith
 ## Installation
 1. In your Stable Diffusion Web UI, navigate to **Extensions** > **Install from URL**
 2. Copy and paste this repository to the URL install
+
 	`https://github.com/uwidev/sd_extension-prompt_formatter`
+
 3. Install
 4. Go to the **Installed** tab and click **Apply and restart UI**
 
