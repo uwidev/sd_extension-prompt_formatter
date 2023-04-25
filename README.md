@@ -1,4 +1,6 @@
 ![Demonstration](/demo/demo.gif)
+plz ignore the bug [smiling:0.91], it's already fixed, gif will update... later!
+
 # sd_extension-prompt_formatter
 This is an extension that adds a magic button next to your prompt to make it look neat and "optimized." It does several things.
 1. Normalizes letters/symbols/etc to their standardized equivalent for compatability ([NFKC](https://en.wikipedia.org/wiki/Unicode_equivalence#Normal_forms))
