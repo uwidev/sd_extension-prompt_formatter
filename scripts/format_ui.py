@@ -84,7 +84,7 @@ def token_bracket_to_weight(token:str):
     depth = abs(power)
 
     if re.search(r':\d+.?\d*', token):
-        return token[depth:len(token)-depth]
+        return f'({token[depth:len(token)-depth]})'
     
     weight = 1.1 ** power
     return '(' + token[depth:len(token)-depth] + ('' if token[-depth-1:-depth] == ':' else ':') + f'{weight:.2f})'
