@@ -5,6 +5,8 @@ import unicodedata
 from modules import script_callbacks
 
 
+bracketing = '([{<)]}>'
+
 none = r'(?:\\[()\[\]{}<>]|[^,(){}\[\]{}<>])+'
 paren = r'\(+' + none + r'\)+'
 square = r'\[+' + none + r'\]+'
@@ -19,48 +21,21 @@ re_brackets_open = re.compile(r'[(\[{]+')
 ui_prompts = []
 
 
-def bracket_to_weights(token:str):
-    # If weighting already exists, just get rid of excess brackets
-    if not re_brackets_open.match(token):
-        return token
-    
-    brackets = re_brackets_open.match(token).group(0)
-    power = len(brackets) if brackets[0] in '{(' else - len(brackets)
-
-    if re.search(r':\d+.?\d*', token):
-        return token[power-1:len(token) if power == 1 else - power + 1]
-    
-    weight = 1.1 ** power
-    return token[power-1:-power] + ('' if token[-power-1:-power] == ':' else ':') + f'{weight:.2f})'
-
-
-def on_before_component(component: gr.component, **kwargs: dict):
-    if 'elem_id' in kwargs:
-        if kwargs['elem_id'] in ['txt2img_prompt', 'txt2img_neg_prompt', 'img2img_prompt', 'img2img_neg_prompt']:
-            ui_prompts.append(component)
-        elif kwargs['elem_id'] == 'paste':
-            with gr.Blocks(analytics_enabled=False) as ui_component:
-                button = gr.Button(value='🪄', elem_classes='tool', elem_id='format')
-                button.click(
-                    fn=format_prompt,
-                    inputs=ui_prompts,
-                    outputs=ui_prompts
-                )
-                return ui_component
+def get_closing(c: str):
+    return bracketing[bracketing.find(c) + len(bracketing)//2]
 
 
 def fix_bracketing(token: str):
     # token should always have at least 1 matching pair
-    # re_tokenizer will ensure that's always the case
+    # tokenizer() should always ensure that's always the case
     if not re.match(r'[\(\[{<]', token):
         return token
     
     stack = []
     ret = list(token)
 
-    bracketing = '([{<)]}>'
     opening = ret[0]
-    closing = bracketing[bracketing.find(opening) + len(bracketing)//2]
+    closing = get_closing(opening)
     
     for i, c in enumerate(token):
         if token[i] == opening:
@@ -96,7 +71,23 @@ def min_normalized_brackets(tokens: list):
 
 
 def brackets_to_weights(tokens: list):
-    return list(map(bracket_to_weights, tokens))
+    return list(map(token_bracket_to_weight, tokens))
+
+
+def token_bracket_to_weight(token:str):
+    # If weighting already exists, just get rid of excess brackets
+    if not re_brackets_open.match(token):
+        return token
+    
+    brackets = re_brackets_open.match(token).group(0)
+    power = len(brackets) if brackets[0] in '{(' else -len(brackets)
+    depth = abs(power)
+
+    if re.search(r':\d+.?\d*', token):
+        return token[depth-1:len(token)-1 if depth == 1 else - depth]
+    
+    weight = 1.1 ** power
+    return token[depth-1:len(token)-1 if depth == 1 else -depth] + ('' if token[-depth-1:-depth] == ':' else ':') + f'{weight:.2f}' + get_closing(brackets[0])
 
 
 def extract_networks(tokens: list):
@@ -121,6 +112,21 @@ def format_prompt(*prompts: list):
         ret.append(', '.join(list(tokens)))
     
     return ret
+
+
+def on_before_component(component: gr.component, **kwargs: dict):
+    if 'elem_id' in kwargs:
+        if kwargs['elem_id'] in ['txt2img_prompt', 'txt2img_neg_prompt', 'img2img_prompt', 'img2img_neg_prompt']:
+            ui_prompts.append(component)
+        elif kwargs['elem_id'] == 'paste':
+            with gr.Blocks(analytics_enabled=False) as ui_component:
+                button = gr.Button(value='🪄', elem_classes='tool', elem_id='format')
+                button.click(
+                    fn=format_prompt,
+                    inputs=ui_prompts,
+                    outputs=ui_prompts
+                )
+                return ui_component
 
 
 script_callbacks.on_before_component(on_before_component)
