@@ -26,7 +26,6 @@ def bracket_to_weights(token:str):
     
     brackets = re_brackets_open.match(token).group(0)
     power = len(brackets) if brackets[0] in '{(' else - len(brackets)
-    # print(power)
 
     if re.search(r':\d+.?\d*', token):
         return token[power-1:len(token) if power == 1 else - power + 1]
@@ -40,7 +39,6 @@ def on_before_component(component: gr.component, **kwargs: dict):
         if kwargs['elem_id'] in ['txt2img_prompt', 'txt2img_neg_prompt', 'img2img_prompt', 'img2img_neg_prompt']:
             ui_prompts.append(component)
         elif kwargs['elem_id'] == 'paste':
-            print(kwargs)
             with gr.Blocks(analytics_enabled=False) as ui_component:
                 button = gr.Button(value='🪄', elem_classes='tool', elem_id='format')
                 button.click(
