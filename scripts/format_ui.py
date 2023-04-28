@@ -458,6 +458,10 @@ def format_prompt(*prompts: list):
     ret = []
 
     for prompt in prompts:
+        if not prompt or prompt.strip() == '':
+            ret.append('')
+            continue
+
         # Clean up the string
         prompt = normalize_characters(prompt)
         prompt = remove_mismatched_brackets(prompt)
