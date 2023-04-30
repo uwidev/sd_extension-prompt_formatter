@@ -34,6 +34,7 @@ re_is_prompt_alternating = re.compile(r'\[.*|.*\]')
 re_is_wildcard = re.compile(r'{.*}')
 re_AND = re.compile(r'(.*?)\s*(AND)\s*(.*?)')
 re_alternating = re.compile(r'\s*(\|)\s*')
+re_existing_weight = re.compile(r'(?<=:)(\d+.?\d*|\d*.?\d+)(?=[)\]]$)')
 
 ui_prompts = []
 
@@ -370,13 +371,13 @@ def bracket_to_weights(prompt: str):
                 gradient_search,
                 is_square_brackets)
             
-            # Check if weight already exists
             if weight:
-                if re_existing_weight.search(ret[:insert_at + 1]):
+                # If weight already exists, ignore
+                current_weight = re_existing_weight.search(ret[:insert_at + 1])
+                if current_weight:
                     ret = ret[:open_bracketing.start()] + '(' + ret[open_bracketing.start()+valid_consecutive:insert_at] + ')' + ret[insert_at + consecutive:]
                 else:
                     ret = ret[:open_bracketing.start()] + '(' + ret[open_bracketing.start()+valid_consecutive:insert_at] + f':{weight:.2f}' + ')' + ret[insert_at + consecutive:]
-                # offset = len(str(f'{weight:.2f}'))
             
             depths, gradients, brackets = get_mappings(ret)
             pos += 1
