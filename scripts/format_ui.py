@@ -123,7 +123,7 @@ def align_commas(prompt: str):
     split = re_comma_spacing.split(prompt)
     split = map(str.strip, split)
     split = filter(None, split)
-    return ', '.join(split)
+    return ','.join(split)
 
 
 # def brackets_to_weights(tokens: list, power: int = 0):
