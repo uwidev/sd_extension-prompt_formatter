@@ -1,5 +1,4 @@
 ![Demonstration](/demo/demo.gif)
-plz ignore the bug [smiling:0.91], it's already fixed, gif will update... later!
 
 # sd_extension-prompt_formatter
 This is an extension for [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui) that adds a magic button next to your prompt to make it look neat and "optimized." It does several things.
