@@ -52,11 +52,12 @@ Inspiration from taken from [canisminor1990/sd-webui-kitchen-theme](https://gith
 - [x] fix: do not convert {} to () (wildcard fix) ⏫ ✅ 2023-04-27
 - [x] handle additional bracekt weighting within nested brackets e.g. ((A), (B)) => ((A, B)) => (A, B:1.21) ✅ 2023-04-27
 - [x] Somehow magically resolve mixed bracketing (e.g. `([<1girl>])` who types their prompts like this?!1) ✅ 2023-04-27 **maybe fixed?**
+- [ ] Respect new lines (useful when splitting prompt on BREAK)
 - [ ] Further simplify `[(a:0.91)]` => `(a:0.83)`, instead of `((a:0.91):0.91)`
 - [ ] A `Revert` button just in case it formats it incorrectly (and my logic be funky) 🔼 
 - [ ] Have moving networks to the back a option rather than always enforced.
-- [ ] Extension settings menu.
-- [ ] Option to convert token spaces to underscore
+- [x] Extension settings menu.
+- [x] Option to convert token spaces to underscore
 - [ ] have an option multiple weighted tagged blocks into individual blocks? e.g. (A, B:1.2) => (A:1.2), (B:1.2)
 - [ ] Update the top right token counter so that it's not red on prompt format (need to learn javascript for that one it seems)
 - [ ] Option to normalize brackets to their maximum matching pair (e.g. `(((a` -> `(((a)))`
