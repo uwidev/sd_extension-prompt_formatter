@@ -352,14 +352,38 @@ def get_weight(prompt: str, map_gradient: list, map_depth: list, map_brackets: l
 
 
 def space_to_underscore(prompt: str):
-    match = r'(?<!BREAK) +(?!BREAK)' if SPACE2UNDERSCORE else r'(?<!BREAK)_+(?!BREAK)'
+    # We need to look ahead and ignore any spaces/underscores within network tokens
+    # INPUT     <lora:chicken butt>, multiple subjects
+    # OUTPUT    <lora:chicken butt>, multiple_subjects
+    match = r'(?<!BREAK) +(?!BREAK|[^<]*>)' if SPACE2UNDERSCORE else r'(?<!BREAK)_+(?!BREAK|[^<]*>)'
     replace = '_' if SPACE2UNDERSCORE else ' '
 
-    tokens = tokenize(prompt)
+    tokens: str = tokenize(prompt)
+    
     return ','.join(map(lambda t: re.sub(match, replace, t), tokens))
-    
 
+
+def escape_bracket_index(token, symbols, start_index = 0):
+    # Given a token and a set of open bracket symbols, find the index in which that character
+    # escapes the given bracketing such that depth = 0.
+    token_length = len(token)
+    open = symbols
+    close = ''
+    for s in symbols:
+        close += brackets_closing[brackets_opening.index(s)]
+
+    i = start_index
+    d = 0
+    while i < token_length - 1:
+        if token[i] in open:
+            d += 1
+        if token[i] in close:
+            d -= 1
+            if d == 0:
+                return i
+        i += 1
     
+    return i
 
 
 def format_prompt(*prompts: list):
@@ -433,7 +457,7 @@ def on_ui_settings():
         'pfromat_space2underscore',
         shared.OptionInfo(
             False,
-            'Convert spaces to underscores (default: does the opposite)',
+            'Convert spaces to underscores (default: underscore to spaces)',
             gr.Checkbox,
             {'interactive': True},
             section=section
