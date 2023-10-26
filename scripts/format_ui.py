@@ -18,7 +18,8 @@ Regex stuff
 brackets_opening = "([{<"
 brackets_closing = ")]}>"
 
-re_tokenize = re.compile(r"\s*,\s*")
+re_whitespace = re.compile(r"[^\S\r\n]+")  # excludes new lines
+re_tokenize = re.compile(r",")
 re_comma_spacing = re.compile(r",+")
 re_brackets_fix_whitespace = re.compile(r"([\(\[{<])\s*|\s*([\)\]}>}])")
 re_opposing_brackets = re.compile(r"([)\]}>])([([{<])")
@@ -65,7 +66,7 @@ def tokenize(data: str) -> list:
 
 
 def remove_whitespace_excessive(prompt: str):
-    return " ".join(prompt.split())
+    return " ".join(re.split(re_whitespace, prompt))
 
 
 def align_brackets(prompt: str):
@@ -101,8 +102,15 @@ def align_commas(prompt: str):
     if not SPACE_COMMAS:
         return prompt
 
+    def strip_spaces(split: str):
+        """Remove excessie spaces to space properly later.
+
+        No need to deal with other types of whitespace, as that's already been dealt.
+        """
+        return split.strip(" ")
+
     split = re_comma_spacing.split(prompt)
-    split = map(str.strip, split)
+    split = map(strip_spaces, split)
     split = filter(None, split)
     return ", ".join(split)
 
