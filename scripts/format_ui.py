@@ -11,6 +11,7 @@ Formatting settings
 SPACE_COMMAS = True
 BRACKET2WEIGHT = True
 SPACE2UNDERSCORE = False
+IGNOREUNDERSCORES = True
 
 """
 Regex stuff
@@ -444,7 +445,10 @@ def format_prompt(*prompts: list):
 
         # Clean up whitespace for cool beans
         prompt = remove_whitespace_excessive(prompt)
-        prompt = space_to_underscore(prompt)
+
+        # Replace Spaces and/or underscores, unless disabled
+        if IGNOREUNDERSCORES == False: prompt = space_to_underscore(prompt)
+            
         prompt = align_brackets(prompt)
         prompt = space_and(prompt)  # for proper compositing alignment on colons
         prompt = space_bracekts(prompt)
@@ -509,15 +513,26 @@ def on_ui_settings():
             section=section,
         ),
     )
+    shared.opts.add_option(
+        "pfromat_ignoreunderscores",
+        shared.OptionInfo(
+            True,
+            "Do not convert either spaces or underscores (preserves DanBooru tag formatting)",
+            gr.Checkbox,
+            {"interactive": True},
+            section=section,
+        ),
+    )
 
     sync_settings()
 
 
 def sync_settings():
-    global SPACE_COMMAS, BRACKET2WEIGHT, SPACE2UNDERSCORE
+    global SPACE_COMMAS, BRACKET2WEIGHT, SPACE2UNDERSCORE, IGNOREUNDERSCORES
     SPACE_COMMAS = shared.opts.pformat_space_commas
     BRACKET2WEIGHT = shared.opts.pfromat_bracket2weight
     SPACE2UNDERSCORE = shared.opts.pfromat_space2underscore
+    IGNOREUNDERSCORES = shared.opts.pfromat_ignoreunderscores
 
 
 script_callbacks.on_before_component(on_before_component)
